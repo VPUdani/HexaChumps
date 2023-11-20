@@ -1,0 +1,94 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>  // Added for string operations
+
+#define NUM_QUESTIONS 5
+#define MAX_PARTICIPANTS 10
+#define MAX_NAME_LENGTH 50
+
+typedef struct {
+    char question[100];
+    int answer; // 1 for true, 0 for false
+} QuizQuestion;
+
+typedef struct {
+    char name[MAX_NAME_LENGTH];
+    int scores[NUM_QUESTIONS];
+    int totalScore;
+} Participant;
+
+int main() {
+    // Define quiz questions
+    QuizQuestion questions[NUM_QUESTIONS] = {
+        {"C is a high-level programming language.", 0},
+        {"The 'printf' function is used to output data in C.", 1},
+        {"Arrays in C can only store elements of the same data type.", 0},
+        {"In C, '==' is the symbol used for assignment.", 0},
+        {"The 'sizeof' operator in C returns the size of a data type.", 1}
+    };
+
+    // Variables for the quiz
+    Participant participants[MAX_PARTICIPANTS];
+
+    int numParticipants;
+    printf("Enter the number of participants (up to %d): ", MAX_PARTICIPANTS);
+    scanf("%d", &numParticipants);
+
+    // Input participant names and conduct the quiz
+    for (int i = 0; i < numParticipants; ++i) {
+        printf("\nEnter name for Participant %d: ", i + 1);
+        scanf("%s", participants[i].name);
+        participants[i].totalScore = 0;
+
+        // Conduct the quiz for each participant
+        for (int j = 0; j < NUM_QUESTIONS; ++j) {
+            printf("Question %d for %s: %s\n", j + 1, participants[i].name, questions[j].question);
+            printf("Enter 1 for True or 0 for False: ");
+            int userAnswer;
+            scanf("%d", &userAnswer);
+
+            // Check the answer and update the score
+            if (userAnswer == questions[j].answer) {
+                printf("Correct!\n");
+                participants[i].scores[j] = 1;
+                participants[i].totalScore++;
+            } else {
+                printf("Incorrect.\n");
+                participants[i].scores[j] = 0;
+            }
+        }
+    }
+
+    // Sort participants based on total scores from highest to lowest
+    for (int i = 0; i < numParticipants - 1; ++i) {
+        for (int j = i + 1; j < numParticipants; ++j) {
+            if (participants[i].totalScore < participants[j].totalScore) {
+                // Swap total scores
+                int tempTotalScore = participants[i].totalScore;
+                participants[i].totalScore = participants[j].totalScore;
+                participants[j].totalScore = tempTotalScore;
+
+                // Swap participant names
+                char tempName[MAX_NAME_LENGTH];
+                strcpy(tempName, participants[i].name);
+                strcpy(participants[i].name, participants[j].name);
+                strcpy(participants[j].name, tempName);
+
+                // Swap individual question scores
+                for (int k = 0; k < NUM_QUESTIONS; ++k) {
+                    int tempScore = participants[i].scores[k];
+                    participants[i].scores[k] = participants[j].scores[k];
+                    participants[j].scores[k] = tempScore;
+                }
+            }
+        }
+    }
+
+    // Display sorted participants and their scores
+    printf("\nSorted Participants and Scores:\n");
+    for (int i = 0; i < numParticipants; ++i) {
+        printf("Participant %d: %s - Total Score: %d\n", i + 1, participants[i].name, participants[i].totalScore);
+    }
+
+    return 0;
+}
